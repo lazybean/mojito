@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2012, Yahoo! Inc.  All rights reserved.
+ * Copyright (c) 2011-2013, Yahoo! Inc.  All rights reserved.
  * Copyrights licensed under the New BSD License.
  * See the accompanying LICENSE file for terms.
  */
@@ -20,6 +20,9 @@ YUI().use('mojito', 'test', function (Y) {
         realListen,
         server,
         app;
+
+    // workaround for issue with arrow when isatty===false
+    process.stdout.isTTY = true
 
     function cmp(x, y, msg) {
         var i;
