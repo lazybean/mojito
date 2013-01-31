@@ -13,6 +13,9 @@ YUI().use('mojito-action-context', 'test', function (Y) {
             getAppConfig: function() {
                 return 'app config';
             },
+            getStaticAppConfig: function() {
+                return 'static app config';
+            },
             getStaticContext: function() {
                 return 'static context';
             },
@@ -56,6 +59,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         views: 'views'
                     }
                 },
+                adapter: Y.Mock(),
                 models: {},
                 controller: {index: function() {}},
                 store: store
@@ -87,6 +91,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         views: 'views'
                     }
                 },
+                adapter: Y.Mock(),
                 models: {},
                 controller: {index: function() {}},
                 store: store
@@ -118,6 +123,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         views: 'views'
                     }
                 },
+                adapter: Y.Mock(),
                 models: {},
                 controller: {index: function() {}},
                 store: store
@@ -148,6 +154,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         views: 'views'
                     }
                 },
+                adapter: Y.Mock(),
                 models: {},
                 controller: {index: function() {}},
                 dispatcher: 'the dispatcher',
@@ -173,6 +180,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         acAddons: ['custom']
                     }
                 },
+                adapter: Y.Mock(),
                 controller: {index: function() {}},
                 store: store
             });
@@ -196,6 +204,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         views: 'views'
                     }
                 },
+                adapter: Y.Mock(),
                 models: {},
                 controller: {index: function() {}},
                 store: store
@@ -251,6 +260,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         ]
                     }
                 },
+                adapter: Y.Mock(),
                 controller: {index: function() {}},
                 store: store
             });
@@ -276,6 +286,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         acAddons: []
                     }
                 },
+                adapter: Y.Mock(),
                 controller: {index: function() {}},
                 store: store
             });
@@ -305,6 +316,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         views: {}
                     }
                 },
+                adapter: Y.Mock(),
                 controller: {index: function() {}},
                 store: store
             });
@@ -337,6 +349,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         views: {}
                     }
                 },
+                adapter: Y.Mock(),
                 controller: {index: function() {}},
                 store: store
             });
@@ -375,6 +388,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         views: {}
                     }
                 },
+                adapter: Y.Mock(),
                 controller: {index: function() {}},
                 store: store
             });
@@ -408,6 +422,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         views: {}
                     }
                 },
+                adapter: Y.Mock(),
                 controller: {index: function() {}},
                 store: store
             });
@@ -441,6 +456,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         views: {}
                     }
                 },
+                adapter: Y.Mock(),
                 controller: {index: function() {}},
                 store: store
             });
@@ -494,6 +510,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         }
                     }
                 },
+                adapter: Y.Mock(),
                 controller: {index: function() {}},
                 store: store
             });
@@ -539,6 +556,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         }
                     }
                 },
+                adapter: Y.Mock(),
                 controller: {index: function() {}},
                 store: store
             });
@@ -580,6 +598,9 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                     return {
                         actionTimeout: 1
                     };
+                },
+                getStaticAppConfig: function() {
+                    return 'static app config';
                 },
                 getStaticContext: function() {
                     return 'static context';
@@ -635,6 +656,9 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         actionTimeout: 1000
                     };
                 },
+                getStaticAppConfig: function() {
+                    return 'static app config';
+                },
                 getStaticContext: function() {
                     return 'static context';
                 },
@@ -686,6 +710,9 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                     return {
                         actionTimeout: 1000
                     };
+                },
+                getStaticAppConfig: function() {
+                    return 'static app config';
                 },
                 getStaticContext: function() {
                     return 'static context';
@@ -744,6 +771,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                         views: {}
                     }
                 },
+                adapter: Y.Mock(),
                 controller: {index: function() {}},
                 store: store
             });
@@ -777,6 +805,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
                 ac = new Y.mojito.ActionContext({
                     dispatch: 'the dispatch',
                     command: command,
+                    adapter: Y.Mock(),
                     controller: {
                         // no index() action
                     },
@@ -803,6 +832,7 @@ YUI().use('mojito-action-context', 'test', function (Y) {
             var ac = new Y.mojito.ActionContext({
                     dispatch: 'the dispatch',
                     command: command,
+                    adapter: Y.Mock(),
                     controller: {
                         __call: function() {
                             callCalled = true;
@@ -817,6 +847,9 @@ YUI().use('mojito-action-context', 'test', function (Y) {
             var store = {
                 getAppConfig: function() {
                     return {};
+                },
+                getStaticAppConfig: function() {
+                    return 'static app config';
                 },
                 getStaticContext: function() {
                     return {};
@@ -959,6 +992,11 @@ YUI().use('mojito-action-context', 'test', function (Y) {
         'test pathToRoot for views': function() {
             var store = {
                     getAppConfig: function() {
+                        return {
+                            pathToRoot: '/path/to/root/'
+                        };
+                    },
+                    getStaticAppConfig: function() {
                         return {
                             pathToRoot: '/path/to/root/'
                         };

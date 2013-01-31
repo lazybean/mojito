@@ -32,14 +32,14 @@ YUI().use('mojito-composite-addon', 'test', function(Y) {
                         }
                     }
                 },
-                datamock = {data: 'mock'},
-                metamock = {meta: 'mock'},
-                adapter = null,
+                datamock = {bar: 'mock'},
+                metamock = {assets: {foo: 'mock'}},
+                adapter = Y.Mock(),
                 ac = {
                     done: function(data, meta) {
                         doneCalled = true;
-                        OA.areEqual(datamock, data, "wrong data value");
-                        OA.areEqual(metamock, meta, "wrong meta value");
+                        A.areEqual('mock', data.bar, "wrong data value");
+                        A.areEqual('mock', metamock.assets.foo, "wrong meta value");
                     }, _notify: function() {}
                 },
                 c = new Y.mojito.addons.ac.composite(command, adapter, ac),
@@ -82,7 +82,7 @@ YUI().use('mojito-composite-addon', 'test', function(Y) {
 
         'test execute dispatches each child': function() {
             var command = {instance: {}},
-                adapter = null,
+                adapter = Y.Mock(),
                 ac = {
                     _dispatch: function(command, adapter) {
                         A.isObject(command, "bad command object to dispatch");
@@ -118,6 +118,45 @@ YUI().use('mojito-composite-addon', 'test', function(Y) {
 
         },
 
+        'test templateData (new API)': function() {
+
+            var command = {
+                    instance: {
+                        config: {
+                            children: {
+                                kid_a: { id: 'kid_a', type: 'kida' },
+                                kid_b: { id: 'kid_b', type: 'kidb' }
+                            }
+                        }
+                    }
+                },
+                adapter = Y.Mock(),
+                ac = {
+                    done: function(data, meta) {
+                        doneCalled = true;
+                        A.isString(data.foo);
+                        A.areSame('fooval', data.foo, "template data didn't transfer");
+                        A.areSame('kid_a__data', data.kid_a, "Missing core child data");
+                        A.areSame('kid_b__data', data.kid_b, "Missing core child data");
+                    },
+                    _dispatch: function(command, adapter) {
+                        var id = command.instance.id;
+                        var meta = {};
+                        meta[id] = id + '__meta';
+                        adapter.done(id + '__data', meta);
+                    }, _notify: function() {}
+                },
+                c = new Y.mojito.addons.ac.composite(command, adapter, ac),
+                doneCalled = false;
+
+            c.done({
+                foo: 'fooval'
+            });
+
+            A.isTrue(doneCalled, "ac done function never called");
+
+        },
+
         'test run extra template data can be passed with no child or params': function() {
 
             var command = {
@@ -130,7 +169,7 @@ YUI().use('mojito-composite-addon', 'test', function(Y) {
                         }
                     }
                 },
-                adapter = null,
+                adapter = Y.Mock(),
                 ac = {
                     done: function(data, meta) {
                         doneCalled = true;
@@ -161,7 +200,7 @@ YUI().use('mojito-composite-addon', 'test', function(Y) {
 
         'test error is thrown when children is an array': function() {
             var command = {instance: {}},
-                adapter = null,
+                adapter = Y.Mock(),
                 ac = {},
                 c = new Y.mojito.addons.ac.composite(command, adapter, ac),
                 config = {
@@ -182,7 +221,7 @@ YUI().use('mojito-composite-addon', 'test', function(Y) {
 
         'test proxied mojits are processed properly': function() {
             var command = {instance: {}},
-                adapter = null,
+                adapter = Y.Mock(),
                 ac = {
                     _dispatch: function(command, adapter) {
                         A.isObject(command, "bad command object to dispatch");
@@ -223,7 +262,7 @@ YUI().use('mojito-composite-addon', 'test', function(Y) {
 
         'test defered mojits are processed properly': function() {
             var command = {instance: {}},
-                adapter = null,
+                adapter = Y.Mock(),
                 ac = {
                     _dispatch: function(command, adapter) {
                         A.isObject(command, "bad command object to dispatch");
@@ -264,7 +303,7 @@ YUI().use('mojito-composite-addon', 'test', function(Y) {
 
         'test null or undefined child should be skipped': function() {
             var command = {instance: {}},
-                adapter = null,
+                adapter = Y.Mock(),
                 countDispatched = 0,
                 ac = {
                     _dispatch: function(command, adapter) {
@@ -298,6 +337,66 @@ YUI().use('mojito-composite-addon', 'test', function(Y) {
             });
 
             A.isTrue(exeCbCalled, "execute callback never called");
+        },
+
+        'test parentMeta (new API)': function() {
+
+            var command = {
+                    instance: {
+                        config: {
+                            children: {
+                                kid_a: { id: 'kid_a', type: 'kida' },
+                                kid_b: { id: 'kid_b', type: 'kidb' }
+                            }
+                        }
+                    }
+                },
+                adapter = Y.Mock(),
+                ac = {
+                    done: function(data, meta) {
+                        doneCalled = true;
+                        A.isString(meta.view.name, 'view.name should come from parentMeta');
+                        A.areSame('fooFromParent', meta.view.name, "child meta should not overrule parent meta");
+                        A.areSame(3, meta.assets.top.js.length, "assets from parent and childs should be merged");
+                        A.isUndefined(meta.view.binder, "meta.view should be preserved from parent without deep merge");
+                        A.areEqual(123, meta.binders.mojitid, "meta.binders map should be preserved from children");
+                    },
+                    _dispatch: function(command, adapter) {
+                        var id = command.instance.id;
+                        var meta = {
+                            view: {
+                                name: 'barFromChild',
+                                binder: 'barFromChildOnly'
+                            },
+                            assets: {
+                                top: {
+                                    js: [id]
+                                }
+                            },
+                            binders: {
+                                mojitid: 123
+                            }
+                        };
+                        meta[id] = id + '__meta';
+                        adapter.done(id + '__data', meta);
+                    },
+                    _notify: function() {}
+                },
+                c = new Y.mojito.addons.ac.composite(command, adapter, ac),
+                doneCalled = false;
+
+            c.done({}, {
+                view: {
+                    name: "fooFromParent"
+                },
+                assets: {
+                    top: {
+                        js: ["one"]
+                    }
+                }
+            });
+
+            A.isTrue(doneCalled, "ac done function never called");
         }
 
     }));
