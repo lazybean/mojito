@@ -15,6 +15,14 @@
                 },
                 "group": "fw,unit,server"
             },
+            "test.js": {
+                "params": {
+                    "test": "./test-test.js",
+                    "lib": "$$config.mojitodir$$/lib/app/commands/test.js",
+                    "driver": "nodejs"
+                },
+                "group": "fw,unit,server"
+            },
             "info.js": {
                 "params": {
                     "test": "./test-info.js",
@@ -67,6 +75,22 @@
                 "params": {
                     "test": "./test-jslint.js",
                     "lib-DISABLED-BZ6046277": "$$config.mojitodir$$/lib/app/commands/jslint.js",
+                    "driver": "nodejs"
+                },
+                "group": "fw,unit,server"
+            },
+            "compile.js": {
+                "params": {
+                    "test": "./test-compile.js",
+                    "lib": "$$config.mojitodir$$/lib/app/commands/compile.js",
+                    "driver": "nodejs"
+                },
+                "group": "fw,unit,server"
+            },
+            "gv.js": {
+                "params": {
+                    "test": "./test-gv.js",
+                    "lib": "$$config.mojitodir$$/lib/app/commands/gv.js",
                     "driver": "nodejs"
                 },
                 "group": "fw,unit,server"

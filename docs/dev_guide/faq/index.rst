@@ -14,6 +14,7 @@ General
 
 * :ref:`What languages can I use to develop mojits? <moj_langs>`  
 * :ref:`Can I work on Mojito applications offline? <moj_offline>` 
+* :ref:`Does Mojito work in a Windows environment? <moj_windows>`
 * :ref:`Do I have to restart Mojito to see updates that I've made to my application? <moj_nodemon>`
 * :ref:`Is the Mojito Y instance persistent across requests? <moj_req_persistent>`
 * :ref:`Does Mojito support lazy loading? <moj_lazyloading>`
@@ -127,6 +128,15 @@ General
     implementations.
 
 ------------
+
+.. _moj_windows:
+.. topic:: **Does Mojito work in a Windows environment?**
+
+    Unfortunately, Mojito is only supported on Unix-based systems. We hope to support
+    Mojito on Windows in the future, so please check the 
+    `Mojito Releases Notes <`https://github.com/yahoo/mojito/wiki>`_ on GitHub for the
+    latest updates.
+
 
 .. _moj_nodemon:
 .. topic:: **Do I have to restart Mojito to see updates that I've made to my application?**
@@ -430,14 +440,15 @@ Data
 .. _moj_parent_mojit_data:
 .. topic:: **How does a parent mojit send data to the template?** 
 
-    From the controller of the parent mojit, pass the ``template`` object to ``ac.done`` 
-    as seen below. The ``template`` object can contain key-value pairs that can be added 
-    to the view template as Handlebars expressions. For example, the key ``foo`` in the 
-    ``template`` object shown here can be used in the template as ``{{foo}}``, which will 
-    be replaced by the value 'bar' when the template is rendered.::
+    From the controller of the parent mojit, pass an object to ``ac.composite.done`` 
+    containing key-value pairs that can be added 
+    to the view template as Handlebars expressions. For example, the key ``foo``
+    shown below can be included in the template as the Handlebars expression ``{{foo}}``.
+    The ``{{foo}}`` expression will be replaced by the value 'bar' when the template 
+    is rendered.::
     
       // Inside parent mojit
-      ac.done({ template: { "foo": "bar" }});
+      ac.composite.done({"foo": "bar"});
     
 ------------    
     

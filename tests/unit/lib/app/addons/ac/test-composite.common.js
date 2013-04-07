@@ -397,6 +397,171 @@ YUI().use('mojito-composite-addon', 'test', function(Y) {
             });
 
             A.isTrue(doneCalled, "ac done function never called");
+        },
+
+        'test failures in child default': function() {
+            var command = {instance: {}},
+                adapter = Y.Mock(),
+                ac = {
+                    _dispatch: function(command, adapter) {
+                        var id = command.instance.id;
+                        if (id === 'kid_a') {
+                            adapter.done(id + '__data', {});
+                        } else {
+                            adapter.error(id + '__error');
+                        }
+                    }
+                },
+                c = new Y.mojito.addons.ac.composite(command, adapter, ac),
+                config = {
+                    children: {
+                        kid_a: { id: 'kid_a', type: 'kida' },
+                        kid_b: { id: 'kid_b', type: 'kidb' }
+                    }
+                },
+                data;
+
+            c.execute(config, function(d, m) {
+                data = d;
+            });
+
+            A.isString(data.kid_a, "missing kid_a data");
+            A.areSame('kid_a__data', data.kid_a, "wrong kid_a data");
+
+            A.isString(data.kid_b, "missing kid_b data");
+            A.areSame('', data.kid_b, "kid_b data should be empty since it failed during dispatch");
+        },
+
+        'test propagateFailure in child': function() {
+            var command = {instance: {}},
+                adapter = Y.Mock(),
+                ac = {
+                    _dispatch: function(command, adapter) {
+                        var id = command.instance.id;
+                        if (id === 'kid_a') {
+                            adapter.done(id + '__data', {});
+                        } else {
+                            adapter.error(id + '__error');
+                        }
+                    }
+                },
+                c = new Y.mojito.addons.ac.composite(command, adapter, ac),
+                config = {
+                    children: {
+                        kid_a: { id: 'kid_a', type: 'kida', propagateFailure: true },
+                        kid_b: { id: 'kid_b', type: 'kidb', propagateFailure: true }
+                    }
+                },
+                data,
+                err;
+
+            adapter.error = function (e) {
+                err = e;
+            };
+            c.execute(config, function(d, m) {
+                data = true;
+            });
+
+
+            A.isUndefined(data, "when an error is propagated, ac.composite.execute callback should never be called");
+            A.areSame('Failed composite because of first child failure of "kid_b"', err, "when an error is propagated, adapter.error should be called");
+        },
+
+        'test addChild response': function() {
+            var command = {instance: {}},
+                adapter = Y.Mock(),
+                ac = Y.Mock(),
+                c,
+                child;
+
+            Y.Mock.expect(ac, {
+                method:"_dispatch",
+                args: [Y.Mock.Value.Object, Y.Mock.Value.Object]
+            });
+
+            c = new Y.mojito.addons.ac.composite(command, adapter, ac);
+
+            // valid child
+            child = c.addChild('foo', {
+                id: 'bar',
+                type: 'baz'
+            });
+
+            A.areSame('bar', child.id, "original config should be returned");
+            Y.Mock.verify(ac);
+        },
+
+        'test addChild invalid entries': function() {
+            var command = {instance: {}},
+                ac = Y.Mock(),
+                c,
+                child;
+
+            c = new Y.mojito.addons.ac.composite(command, Y.Mock(), ac);
+
+            // invalid child
+            child = c.addChild('foo', null);
+            A.isUndefined(child, "invalid child not honored");
+
+            // invalid child with defer and proxy at the same time
+            A.throwsError(Error, function(){
+                child = c.addChild('foo', {
+                    id: 'bar',
+                    type: 'baz',
+                    defer: true,
+                    proxy: {}
+                });
+            });
+        },
+
+        'test addChild defer response': function() {
+            var command = {instance: {}},
+                adapter = Y.Mock(),
+                ac = Y.Mock(),
+                c,
+                child;
+
+            Y.Mock.expect(ac, {
+                method:"_dispatch",
+                args: [Y.Mock.Value.Object, Y.Mock.Value.Object]
+            });
+
+            c = new Y.mojito.addons.ac.composite(command, adapter, ac);
+            child = c.addChild('foo', {
+                id: 'bar',
+                type: 'baz',
+                defer: true
+            });
+
+            A.areSame('LazyLoad', child.type, "type should be replaced with LazyLoad");
+            A.areSame('baz', child.config.proxied.type, "original type should be preserved thru proxied entry");
+            Y.Mock.verify(ac);
+        },
+
+        'test addChild proxy response': function() {
+            var command = {instance: {}},
+                adapter = Y.Mock(),
+                ac = Y.Mock(),
+                c,
+                child;
+
+            Y.Mock.expect(ac, {
+                method:"_dispatch",
+                args: [Y.Mock.Value.Object, Y.Mock.Value.Object]
+            });
+
+            c = new Y.mojito.addons.ac.composite(command, adapter, ac);
+            child = c.addChild('foo', {
+                id: 'bar',
+                type: 'baz',
+                proxy: {
+                    type: "superproxy"
+                }
+            });
+
+            A.areSame('superproxy', child.type, "type should be replaced with the proxy one");
+            A.areSame('baz', child.config.proxied.type, "original type should be preserved thru proxied entry");
+            Y.Mock.verify(ac);
         }
 
     }));
